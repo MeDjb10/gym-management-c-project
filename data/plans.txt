@@ -1,0 +1,4 @@
+3
+1|Musculation Only|50.00|Access to weight training area
+2|Cardio Only|40.00|Access to cardio machines and running track
+3|Musculation + Cardio|70.00|Full access to all gym facilities

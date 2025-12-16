@@ -1,0 +1,6 @@
+5
+1|Dumbbells|Set of dumbbells 5kg-30kg|20
+2|Treadmill|Cardio treadmill machine|5
+3|Bench Press|Weight bench with barbell|8
+4|Rowing Machine|Indoor rowing machine|4
+5|Exercise Bike|Stationary bike for cardio|10
