@@ -2,15 +2,28 @@
 
 ## 🏋️ Description
 
-This project is a console application in C programming language to manage the basic operations of a gym. Upon compilation and execution, a menu is displayed in the terminal. The user — depending on whether they are a member or admin — chooses options via numbers to navigate through the features.
+This project is a simple console application in C to manage a gym. Users can login as a **member** or **admin** to access different features. The application is straightforward and uses basic C concepts without external libraries.
 
-Main features:
+### Key Features:
 
-- For **members**: view the list of plans, subscribe to a plan.
-- For **admin**: create / read / update / delete plans, manage the equipment list (CRUD equipment), list members and their subscriptions, add members, etc.
-- Data persistence (plans, equipment, members/subscriptions) saved in text files (or binary) for persistence between executions.
+- **Member Features:**
 
-The code uses only basic C language tools (standard C, input/output, file manipulation, `struct`, pointers, arrays).
+  - Create a new account (name, password)
+  - Login with username and password
+  - View available plans
+  - Subscribe to a monthly plan
+  - View current subscription and profile
+
+- **Admin Features:**
+
+  - Login with hardcoded admin credentials
+  - Manage members (add, view, delete)
+  - Manage plans (add, view, modify, delete)
+  - Manage equipment (add, view, modify, delete)
+
+- **Data Persistence:** All data (plans, equipment, members, subscriptions) saved in text files and loaded on startup.
+
+The code uses only basic C tools: standard library, file I/O, `struct`, pointers, arrays, and functions — no external libraries needed.
 
 ---
 
@@ -28,16 +41,21 @@ The code uses only basic C language tools (standard C, input/output, file manipu
 
 ```
 /GymManagement
-│── main.c              // entry point + main menu
-│── plans.c             // plan management (CRUD, display, file I/O)
+│── main.c                 // entry point + main menu + user interaction
+│── member.c              // member login, account creation, member menu
+│── member.h
+│── admin.c               // admin login, admin menu
+│── admin.h
+│── plans.c               // plan management (CRUD, file I/O)
 │── plans.h
-│── equipment.c         // equipment management (CRUD, display, file I/O)
+│── equipment.c           // equipment management (CRUD, file I/O)
 │── equipment.h
-│── members.c           // member & subscription management (add, subscribe, display, file I/O)
-│── members.h
-│── io.c                // utility functions for file read/write (optional)
-│── io.h
-│── README.md           // project documentation
+│── members_list.c        // member list management (add, delete, search, file I/O)
+│── members_list.h
+│── file_handler.c        // utility functions for file operations (optional)
+│── file_handler.h
+│── README.md             // project documentation
+│── IMPLEMENTATION_GUIDE.md // step-by-step implementation guide
 ```
 
 ---
@@ -47,31 +65,41 @@ The code uses only basic C language tools (standard C, input/output, file manipu
 Example of `struct` for entities:
 
 ```c
+// Plan structure (subscription types)
 typedef struct {
     int id_plan;
-    char name[50];
-    float price;
-    int duration_months;
+    char name[50];          // e.g., "Musculation Only"
+    float price;            // monthly price in DT
+    char description[100];  // e.g., "Musculation + Cardio"
 } Plan;
 
+// Equipment structure
 typedef struct {
     int id_equipment;
-    char name[50];
+    char name[50];          // e.g., "Dumbbells"
     char description[100];
     int quantity;
 } Equipment;
 
+// Member account structure
 typedef struct {
     int id_member;
-    char name[50];
-    char first_name[50];
-    int id_subscribed_plan; // -1 if no plan
+    char username[50];      // username for login
+    char password[50];      // password
+    char name[50];          // member's real name
+    int id_current_plan;    // -1 if no subscription
 } Member;
+
+// Subscription structure (optional, for tracking subscriptions)
+typedef struct {
+    int id_subscription;
+    int id_member;
+    int id_plan;
+    char subscription_date[20];  // e.g., "2025-12-16"
+} Subscription;
 ```
 
-You can manage collections via **arrays** (`Plan plans[MAX_PLANS]`, etc.) + a counter of current numbers. Or, for more flexibility, via **dynamic allocations** with `malloc`, and pointers to `struct`.
-
-Passing structures to functions will be done **by pointer**, to allow direct modification.
+All collections are managed via **fixed-size arrays** (`Plan plans[MAX_PLANS]`, `Member members[MAX_MEMBERS]`, etc.) with a **counter** tracking the current number of elements. This keeps it simple and avoids dynamic memory complexity.
 
 ---
 
@@ -85,22 +113,39 @@ This allows you to keep plans, equipment, members and subscriptions between diff
 
 ## 🧩 Functions / Planned Features
 
-Here is a non-exhaustive list of functions / possible actions:
+### Member Functions:
 
-- Display the main menu (member / admin choice / exit)
-- For "member":
+- `create_member_account()` - Get name, username, password, confirm password, save to file
+- `member_login()` - Verify username and password, return member ID if successful
+- `display_member_menu()` - Show member menu options
+- `view_all_plans()` - Display all available plans
+- `subscribe_to_plan()` - Associate member with a plan
+- `view_member_subscriptions()` - Show current subscription
+- `view_member_profile()` - Display member info
 
-  - display the list of available plans
-  - subscribe to a plan (associate a member with a plan)
+### Admin Functions:
 
-- For "admin":
+- `admin_login()` - Verify hardcoded admin credentials
+- `display_admin_menu()` - Show admin menu options
+- **Plan Management:** add_plan(), view_all_plans(), modify_plan(), delete_plan()
+- **Equipment Management:** add_equipment(), view_all_equipment(), modify_equipment(), delete_equipment()
+- **Member Management:** view_all_members(), search_member(), delete_member()
 
-  - display the list of plans / add a plan / modify a plan / delete a plan
-  - display the list of equipment / add equipment / modify equipment / delete equipment
-  - display the list of members / add member / (optional) delete member / view their subscriptions
+### File I/O Functions:
 
-- Utility functions: load data from files, save data to files, search for an element by id, etc.
-- Simple input validation (for example: verify that the entered id exists, that the number of equipment remains consistent, etc.)
+- `load_plans_from_file()` - Load plans from plans.txt
+- `save_plans_to_file()` - Save plans to plans.txt
+- `load_members_from_file()` - Load member accounts from members.txt
+- `save_members_to_file()` - Save member accounts to members.txt
+- `load_equipment_from_file()` - Load equipment from equipment.txt
+- `save_equipment_to_file()` - Save equipment to equipment.txt
+
+### Utility Functions:
+
+- `generate_new_id()` - Generate unique IDs
+- `find_member_by_username()` - Search for member by username
+- `find_plan_by_id()` - Search for plan by ID
+- Input validation functions
 
 ---
 
@@ -184,9 +229,7 @@ Data (plans, members, equipment) is saved in text files so that it can be reload
 
 ## 🖥️ Terminal Display & Menu Structure
 
-When the application starts, the user will see the main menu. The display will look like this:
-
-### Main Menu
+### 1. Main Menu (First Screen)
 
 ```
 ===========================
@@ -198,7 +241,39 @@ When the application starts, the user will see the main menu. The display will l
 ===========================
 ```
 
-### Member Menu
+### 2. Member Authentication Menu
+
+```
+===========================
+     MEMBER LOGIN
+===========================
+1 - Create New Account
+2 - Login
+3 - Back to Main Menu
+===========================
+```
+
+#### 2a. Create Member Account
+
+```
+--- Create New Account ---
+Enter Name: John Doe
+Enter Username: johndoe
+Enter Password: ****
+Confirm Password: ****
+Account created successfully!
+```
+
+#### 2b. Member Login
+
+```
+--- Member Login ---
+Enter Username: johndoe
+Enter Password: ****
+Login successful! Welcome John Doe!
+```
+
+### 3. Member Menu (After Login)
 
 ```
 ===========================
@@ -212,7 +287,32 @@ When the application starts, the user will see the main menu. The display will l
 ===========================
 ```
 
-### Admin Menu
+#### 3a. Available Plans
+
+```
+--- Available Plans ---
+ID: 1 | Musculation Only | 50 DT/month
+ID: 2 | Cardio Only | 40 DT/month
+ID: 3 | Musculation + Cardio | 70 DT/month
+```
+
+#### 3b. Subscribe to Plan
+
+```
+Enter Plan ID to subscribe: 3
+Subscription to "Musculation + Cardio" (70 DT/month) successful!
+```
+
+### 4. Admin Login Menu
+
+```
+--- Admin Login ---
+Enter Admin Username: admin
+Enter Admin Password: ****
+Login successful!
+```
+
+### 5. Admin Menu (After Login)
 
 ```
 ===========================
@@ -221,27 +321,25 @@ When the application starts, the user will see the main menu. The display will l
 1 - Manage Plans
 2 - Manage Equipment
 3 - Manage Members
-4 - View Reports
 0 - Back to Main Menu
 ===========================
 ```
 
-### Plan Management (Admin)
+#### 5a. Plan Management
 
 ```
 ===========================
-      PLAN MANAGEMENT
+    PLAN MANAGEMENT
 ===========================
 1 - Add New Plan
 2 - View All Plans
-3 - Search Plan
-4 - Modify Plan
-5 - Delete Plan
+3 - Modify Plan
+4 - Delete Plan
 0 - Back to Admin Menu
 ===========================
 ```
 
-### Equipment Management (Admin)
+#### 5b. Equipment Management
 
 ```
 ===========================
@@ -249,25 +347,21 @@ When the application starts, the user will see the main menu. The display will l
 ===========================
 1 - Add New Equipment
 2 - View All Equipment
-3 - Search Equipment
-4 - Modify Equipment
-5 - Delete Equipment
+3 - Modify Equipment
+4 - Delete Equipment
 0 - Back to Admin Menu
 ===========================
 ```
 
-### Member Management (Admin)
+#### 5c. Member Management
 
 ```
 ===========================
     MEMBER MANAGEMENT
 ===========================
-1 - Add New Member
-2 - View All Members
-3 - Search Member
-4 - Modify Member
-5 - Delete Member
-6 - Manage Subscriptions
+1 - View All Members
+2 - Search Member
+3 - Delete Member
 0 - Back to Admin Menu
 ===========================
 ```
@@ -276,10 +370,11 @@ When the application starts, the user will see the main menu. The display will l
 
 ## 🚀 Possible Extensions (Optional)
 
-- More robust input validation (error handling)
-- Member deletion
-- Subscription modification (plan change)
-- More user-friendly console interface (clear screen, nested menus…)
-- Use of dynamic data structures (allocation / deallocation)
-- Search and filter functionality
-- Reports and statistics on members and subscriptions
+- Email validation for member accounts
+- Update member profile (change password, update name)
+- Monthly renewal reminders for subscriptions
+- Search and filter members by name or subscription plan
+- Statistics on gym usage and revenue
+- Balance/payment tracking for memberships
+- Equipment reservation/booking system
+- Trainer assignment to members
