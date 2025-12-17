@@ -39,6 +39,7 @@ void admin_manage_plans(Plan plans[], int *count) {
         switch (choice) {
             case 1:
                 add_plan_interactive(plans, count);
+                save_plans_to_file(plans, *count);
                 pause_screen();
                 break;
                 
@@ -52,7 +53,9 @@ void admin_manage_plans(Plan plans[], int *count) {
                 if (*count > 0) {
                     printf("\nEnter Plan ID to modify: ");
                     int id = get_int_input();
-                    modify_plan(plans, *count, id);
+                    if (modify_plan(plans, *count, id)) {
+                        save_plans_to_file(plans, *count);
+                    }
                 }
                 pause_screen();
                 break;
@@ -63,7 +66,9 @@ void admin_manage_plans(Plan plans[], int *count) {
                 if (*count > 0) {
                     printf("\nEnter Plan ID to delete: ");
                     int id = get_int_input();
-                    delete_plan(plans, count, id);
+                    if (delete_plan(plans, count, id)) {
+                        save_plans_to_file(plans, *count);
+                    }
                 }
                 pause_screen();
                 break;
@@ -97,6 +102,7 @@ void admin_manage_equipment(Equipment equipment[], int *count) {
         switch (choice) {
             case 1:
                 add_equipment_interactive(equipment, count);
+                save_equipment_to_file(equipment, *count);
                 pause_screen();
                 break;
                 
@@ -110,7 +116,9 @@ void admin_manage_equipment(Equipment equipment[], int *count) {
                 if (*count > 0) {
                     printf("\nEnter Equipment ID to modify: ");
                     int id = get_int_input();
-                    modify_equipment(equipment, *count, id);
+                    if (modify_equipment(equipment, *count, id)) {
+                        save_equipment_to_file(equipment, *count);
+                    }
                 }
                 pause_screen();
                 break;
@@ -121,7 +129,9 @@ void admin_manage_equipment(Equipment equipment[], int *count) {
                 if (*count > 0) {
                     printf("\nEnter Equipment ID to delete: ");
                     int id = get_int_input();
-                    delete_equipment(equipment, count, id);
+                    if (delete_equipment(equipment, count, id)) {
+                        save_equipment_to_file(equipment, *count);
+                    }
                 }
                 pause_screen();
                 break;
