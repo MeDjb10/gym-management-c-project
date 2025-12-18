@@ -4,11 +4,18 @@
 #include "utils.h"
 
 void create_equipment(Equipment *eq, int id, const char *name, const char *desc, int qty) {
+    // Set equipment ID
     eq->id_equipment = id;
+    
+    // Copy equipment name (safely)
     strncpy(eq->name, name, sizeof(eq->name) - 1);
-    eq->name[sizeof(eq->name) - 1] = '\0';
+    eq->name[sizeof(eq->name) - 1] = '\0';  // Ensure null terminator
+    
+    // Copy equipment description (safely)
     strncpy(eq->description, desc, sizeof(eq->description) - 1);
-    eq->description[sizeof(eq->description) - 1] = '\0';
+    eq->description[sizeof(eq->description) - 1] = '\0';  // Ensure null terminator
+    
+    // Set quantity
     eq->quantity = qty;
 }
 
@@ -33,15 +40,23 @@ void display_equipment(Equipment equipment[], int count) {
 }
 
 int get_next_equipment_id(Equipment equipment[], int count) {
-    if (count == 0) return 1;
+    // If no equipment exists, start with ID 1
+    if (count == 0) {
+        return 1;
+    }
     
+    // Find the highest ID among existing equipment
     int max_id = equipment[0].id_equipment;
+    
     for (int i = 1; i < count; i++) {
         if (equipment[i].id_equipment > max_id) {
             max_id = equipment[i].id_equipment;
         }
     }
-    return max_id + 1;
+    
+    // Return the next available ID
+    int next_id = max_id + 1;
+    return next_id;
 }
 
 void add_equipment_interactive(Equipment equipment[], int *count) {
@@ -94,13 +109,19 @@ int modify_equipment(Equipment equipment[], int count, int id) {
     printf("\nNew Equipment Name (or press Enter to keep current): ");
     char name[50];
     get_string_input(name, sizeof(name));
-    if (strlen(name) > 0) {
+    
+    // Check if user entered something
+    int name_length = strlen(name);
+    if (name_length > 0) {
+        // Update the equipment name
         strncpy(equipment[index].name, name, sizeof(equipment[index].name) - 1);
         equipment[index].name[sizeof(equipment[index].name) - 1] = '\0';
     }
     
     printf("New Quantity (or 0 to keep current): ");
     int qty = get_int_input();
+    
+    // Only update if user entered a positive value
     if (qty > 0) {
         equipment[index].quantity = qty;
     }
@@ -108,7 +129,11 @@ int modify_equipment(Equipment equipment[], int count, int id) {
     printf("New Description (or press Enter to keep current): ");
     char desc[100];
     get_string_input(desc, sizeof(desc));
-    if (strlen(desc) > 0) {
+    
+    // Check if user entered something
+    int desc_length = strlen(desc);
+    if (desc_length > 0) {
+        // Update the description
         strncpy(equipment[index].description, desc, sizeof(equipment[index].description) - 1);
         equipment[index].description[sizeof(equipment[index].description) - 1] = '\0';
     }
@@ -127,10 +152,12 @@ int delete_equipment(Equipment equipment[], int *count, int id) {
     
     printf("\nDeleting equipment: %s\n", equipment[index].name);
     
-    // Shift remaining equipment
+    // Move all equipment after the deleted one forward by one position
     for (int i = index; i < *count - 1; i++) {
         equipment[i] = equipment[i + 1];
     }
+    
+    // Decrease the total count
     (*count)--;
     
     printf("Equipment deleted successfully!\n");
@@ -152,12 +179,17 @@ int load_equipment_from_file(Equipment equipment[]) {
         return 0;
     }
     
+    // Read each equipment from file
     for (int i = 0; i < count && i < MAX_EQUIPMENT; i++) {
-        if (fscanf(f, "%d|%49[^|]|%99[^|]|%d\n",
-                   &equipment[i].id_equipment,
-                   equipment[i].name,
-                   equipment[i].description,
-                   &equipment[i].quantity) != 4) {
+        // Read: id|name|description|quantity
+        int fields_read = fscanf(f, "%d|%49[^|]|%99[^|]|%d\n",
+                                 &equipment[i].id_equipment,
+                                 equipment[i].name,
+                                 equipment[i].description,
+                                 &equipment[i].quantity);
+        
+        // Check if we successfully read all 4 fields
+        if (fields_read != 4) {
             printf("Error reading equipment %d from file.\n", i + 1);
             fclose(f);
             return i;

@@ -13,7 +13,13 @@ int admin_login() {
     printf("Enter Admin Password: ");
     get_string_input(password, sizeof(password));
     
-    if (strcmp(username, ADMIN_USERNAME) == 0 && strcmp(password, ADMIN_PASSWORD) == 0) {
+    // Check if username matches
+    int username_correct = strcmp(username, ADMIN_USERNAME);
+    // Check if password matches
+    int password_correct = strcmp(password, ADMIN_PASSWORD);
+    
+    // Both must be 0 (meaning they match)
+    if (username_correct == 0 && password_correct == 0) {
         printf("\n[SUCCESS] Login successful! Welcome Admin!\n");
         return 1;
     }

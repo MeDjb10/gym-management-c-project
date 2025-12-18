@@ -5,15 +5,23 @@
 #include "utils.h"
 
 int get_next_member_id(Member members[], int count) {
-    if (count == 0) return 1;
+    // If no members exist, start with ID 1
+    if (count == 0) {
+        return 1;
+    }
     
+    // Find the highest ID among existing members
     int max_id = members[0].id_member;
+    
     for (int i = 1; i < count; i++) {
         if (members[i].id_member > max_id) {
             max_id = members[i].id_member;
         }
     }
-    return max_id + 1;
+    
+    // Return the next available ID
+    int next_id = max_id + 1;
+    return next_id;
 }
 
 int find_member_by_username(Member members[], int count, const char *username) {
@@ -40,7 +48,9 @@ int create_member_account(Member members[], int *count) {
     printf("Enter Your Full Name: ");
     get_string_input(new_member.name, sizeof(new_member.name));
     
-    if (strlen(new_member.name) == 0) {
+    // Check if name is empty
+    int name_length = strlen(new_member.name);
+    if (name_length == 0) {
         printf("Name cannot be empty!\n");
         return 0;
     }
@@ -48,13 +58,16 @@ int create_member_account(Member members[], int *count) {
     printf("Enter Username: ");
     get_string_input(new_member.username, sizeof(new_member.username));
     
-    if (strlen(new_member.username) == 0) {
+    // Check if username is empty
+    int username_length = strlen(new_member.username);
+    if (username_length == 0) {
         printf("Username cannot be empty!\n");
         return 0;
     }
     
     // Check if username already exists
-    if (find_member_by_username(members, *count, new_member.username) != -1) {
+    int username_exists = find_member_by_username(members, *count, new_member.username);
+    if (username_exists != -1) {
         printf("\nError: Username '%s' already exists!\n", new_member.username);
         printf("Please try again with a different username.\n");
         return 0;
@@ -63,7 +76,9 @@ int create_member_account(Member members[], int *count) {
     printf("Enter Password: ");
     get_string_input(new_member.password, sizeof(new_member.password));
     
-    if (strlen(new_member.password) == 0) {
+    // Check if password is empty
+    int password_length = strlen(new_member.password);
+    if (password_length == 0) {
         printf("Password cannot be empty!\n");
         return 0;
     }
@@ -72,7 +87,9 @@ int create_member_account(Member members[], int *count) {
     char confirm[50];
     get_string_input(confirm, sizeof(confirm));
     
-    if (strcmp(new_member.password, confirm) != 0) {
+    // Check if passwords match
+    int passwords_match = strcmp(new_member.password, confirm);
+    if (passwords_match != 0) {
         printf("\nError: Passwords do not match!\n");
         return 0;
     }
@@ -106,7 +123,9 @@ int member_login(Member members[], int count) {
     printf("Enter Password: ");
     get_string_input(password, sizeof(password));
     
-    if (strcmp(members[member_id].password, password) != 0) {
+    // Check if password matches
+    int password_matches = strcmp(members[member_id].password, password);
+    if (password_matches != 0) {
         printf("\nError: Incorrect password!\n");
         return -1;
     }
@@ -247,13 +266,18 @@ int load_members_from_file(Member members[]) {
         return 0;
     }
     
+    // Read each member from file
     for (int i = 0; i < count && i < MAX_MEMBERS; i++) {
-        if (fscanf(f, "%d|%49[^|]|%49[^|]|%99[^|]|%d\n",
-                   &members[i].id_member,
-                   members[i].username,
-                   members[i].password,
-                   members[i].name,
-                   &members[i].id_current_plan) != 5) {
+        // Read: id|username|password|name|plan_id
+        int fields_read = fscanf(f, "%d|%49[^|]|%49[^|]|%99[^|]|%d\n",
+                                 &members[i].id_member,
+                                 members[i].username,
+                                 members[i].password,
+                                 members[i].name,
+                                 &members[i].id_current_plan);
+        
+        // Check if we successfully read all 5 fields
+        if (fields_read != 5) {
             printf("Error reading member %d from file.\n", i + 1);
             fclose(f);
             return i;
