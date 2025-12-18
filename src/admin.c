@@ -14,7 +14,7 @@ int admin_login() {
     get_string_input(password, sizeof(password));
     
     if (strcmp(username, ADMIN_USERNAME) == 0 && strcmp(password, ADMIN_PASSWORD) == 0) {
-        printf("\n✓ Login successful! Welcome Admin!\n");
+        printf("\n[SUCCESS] Login successful! Welcome Admin!\n");
         return 1;
     }
     

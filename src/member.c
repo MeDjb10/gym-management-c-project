@@ -80,7 +80,7 @@ int create_member_account(Member members[], int *count) {
     members[*count] = new_member;
     (*count)++;
     
-    printf("\n✓ Account created successfully!\n");
+    printf("\n[SUCCESS] Account created successfully!\n");
     printf("Your Member ID: %d\n", new_member.id_member);
     printf("You can now login with your username and password.\n");
     
@@ -111,7 +111,7 @@ int member_login(Member members[], int count) {
         return -1;
     }
     
-    printf("\n✓ Login successful! Welcome %s!\n", members[member_id].name);
+    printf("\n[SUCCESS] Login successful! Welcome %s!\n", members[member_id].name);
     return member_id;
 }
 
@@ -136,7 +136,7 @@ int subscribe_to_plan(Member *member, int plan_id) {
     }
     
     member->id_current_plan = plan_id;
-    printf("\n✓ Subscription successful!\n");
+    printf("\n[SUCCESS] Subscription successful!\n");
     printf("You are now subscribed to Plan ID: %d\n", plan_id);
     return 1;
 }
@@ -192,7 +192,9 @@ void display_member_menu(int member_id, Member members[], int member_count) {
                 if (plan_index == -1) {
                     printf("\nError: Invalid Plan ID!\n");
                 } else {
-                    subscribe_to_plan(&members[member_id], plan_id);
+                    if (subscribe_to_plan(&members[member_id], plan_id)) {
+                        save_members_to_file(members, member_count);
+                    }
                 }
                 pause_screen();
                 break;

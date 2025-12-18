@@ -106,7 +106,7 @@ int main() {
                 save_plans_to_file(plans, plan_count);
                 save_equipment_to_file(equipment, equipment_count);
                 save_members_to_file(members, member_count);
-                printf("\n✓ All data saved successfully!\n");
+                printf("\n[SUCCESS] All data saved successfully!\n");
                 printf("Thank you for using Gym Management System. Goodbye!\n");
                 break;
             }
