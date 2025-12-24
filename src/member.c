@@ -251,6 +251,7 @@ void display_member_menu(int member_id, Member members[], int member_count) {
     } while (choice != 0);
 }
 
+
 int load_members_from_file(Member members[]) {
     FILE *f = fopen("data/members.txt", "r");
     
